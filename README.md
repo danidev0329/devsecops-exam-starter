@@ -28,18 +28,3 @@ You are tasked with taking this baseline Express.js application and building a r
 * Ensure you document your architecture, security choices, and challenges in your own `README.md` (you may overwrite this file for your final submission).
 
 Good luck!
-
-## Security Scanning Demo
-
-To validate that the CI pipeline actually catches vulnerabilities,
-`lodash` was intentionally changed to a known-vulnerable version
-(4.17.15) in package.json.
-
-The Trivy scan step in `.github/workflows/ci.yml` detected this
-and failed the build with HIGH-severity findings:
-
-[screenshot or pasted log of the failed Actions run]
-
-This confirms the pipeline blocks merges/builds containing known
-vulnerable dependencies. After confirming detection, lodash was
-updated to a patched version (^4.17.21) and the pipeline passed.
