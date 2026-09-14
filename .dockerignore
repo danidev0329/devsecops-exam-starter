@@ -1,0 +1,9 @@
+node_modules
+coverage
+dist
+.git
+.gitignore
+.env
+README.md
+Dockerfile
+server.test.js
