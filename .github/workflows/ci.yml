@@ -28,7 +28,7 @@ jobs:
 
       # 4. Run automated tests (Jest)
       name: Run tests
-      run: npm test || echo "no tests found, would add tests in a real project"
+      run: npm test || echo "no tests found, would add tests in a real project" 
 
   build:
     name: Build
@@ -53,3 +53,12 @@ jobs:
       # 4. Build Docker image to verify the Dockerfile
       name: Build Docker image
       run: docker build -t express-health-app:${{ github.sha }} .
+
+      # 5. Scan Docker Image for vulnerabilities
+      name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@0.24.0
+      with:
+          image-ref: 'express-health-app:${{ github.sha }}'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+          format: 'table'

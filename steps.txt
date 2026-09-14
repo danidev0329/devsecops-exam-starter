@@ -8,3 +8,4 @@
     verify:
     http://localhost:3000/health
 4. Integrated a ci piepeline for automation
+5. Run security checks before build and docker build for security using Trivy
