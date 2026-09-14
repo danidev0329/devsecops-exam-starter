@@ -1,10 +1,10 @@
 1. Created a dockerfile
 2. Created dockerignore
-3. Test create a container in docker
+3. Test creating a container in docker
     build:
     docker build -t express-health-app .
     docker run -p 3000:3000 express-health-app
 
     verify:
     http://localhost:3000/health
-4. 
+4. Integrated a ci piepeline for automation
