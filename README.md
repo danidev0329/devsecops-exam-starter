@@ -77,6 +77,15 @@ The pipeline uses **Trivy** (via `aquasecurity/trivy-action`) for container imag
 - **Native GitHub Action** — integrates directly into the workflow as a step.
 - **Fail-fast gating** — configured with `severity: HIGH,CRITICAL` and `exit-code: 1`, so the build fails whenever high or critical vulnerabilities are present.
 
+### Static Analysis: CodeQL
+
+The repository also uses GitHub's native **CodeQL** (`github/codeql-action`) to statically analyze the source code for security flaws:
+
+- **Analyzes the source, not the image** — unlike Trivy, CodeQL inspects the application code itself and flags security bugs such as SQL injection, path traversal, and unsafe deserialization.
+- **Language-aware** — the workflow runs a `javascript-typescript` analysis automatically configured for this repo.
+- **Runs on every push/PR** — `.github/workflows/codeql.yml` triggers on push and pull requests to `main`, plus a weekly scheduled scan.
+- **Zero-trust gating** — alert results are published to the **Security** tab, and the job fails the check when a flaw is detected.
+
 ## Vulnerability Demonstration
 
 To validate that the CI pipeline actually catches vulnerabilities,
