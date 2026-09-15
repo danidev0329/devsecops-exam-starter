@@ -30,6 +30,25 @@ This is the starter repository for the **LSCS DevSecOps Engineering Take-Home Ex
    ```
 3. Verify the health endpoint at `http://localhost:3000/health`.
 
+### Run with Docker Compose
+
+The `docker-compose.yml` file orchestrates the app together with its Postgres database. The database includes a healthcheck, and the app will only start once the database reports healthy.
+
+1. Start the whole stack (builds the image too):
+   ```bash
+   docker compose up -d
+   ```
+2. Verify the app health endpoint at `http://localhost:3000/health`.
+3. The Postgres database is reachable inside the network as `db` on port `5432` with the credentials defined in `docker-compose.yml`.
+4. Stop the stack:
+   ```bash
+   docker compose down
+   ```
+   Add `-v` to also remove the persistent database volume:
+   ```bash
+   docker compose down -v
+   ```
+
 ## Architectural Explanation
 
 ### Base Image: `node:20-alpine`
@@ -39,6 +58,15 @@ The Dockerfile uses `node:20-alpine` instead of `node:latest` for a few reasons:
 - **Minimal footprint** — Alpine Linux is a musl-based, extremely small distribution (~5 MB), which keeps the final image size and attack surface low.
 - **Long-Term Support (LTS)** — Node 20 is an actively maintained LTS release, receiving regular security patches. `node:latest` is an untagged, moving target that can change underneath you, making builds non-reproducible.
 - **Reduced attack surface** — a full `node` image ships a full OS with far more installed packages, increasing the number of potential vulnerabilities.
+
+### Multi-Stage Build
+
+The `Dockerfile` uses a two-stage build to keep the final image as small and secure as possible:
+
+1. **Build stage (`FROM node:20-alpine AS build`)** — copies only `package*.json`, installs production dependencies with `npm ci --omit=dev`, and nothing more. This stage contains npm (and its transitive dependencies), but is discarded after the build.
+2. **Production stage** — starts from a fresh `node:20-alpine` image. It removes the bundled npm (`/usr/local/bin/npm`, `/usr/local/bin/npx`, and `/usr/local/lib/node_modules/npm`), then copies only the installed `node_modules` and application source from the build stage. Finally, it runs as the unprivileged `node` user (`USER node`).
+
+This means the runtime image has no package manager, no source-manifest copies, and no root privileges — shrinking the image and eliminating tooling-only dependencies (such as the `tar` library bundled with npm) from the runtime attack surface.
 
 ### Security Scanner: Trivy
 
@@ -67,5 +95,8 @@ updated to a patched version (^4.17.21) and the pipeline passed.
 
 ## Challenges Faced
 
-> TODO: Replace this with a description of a challenge you encountered while learning/building this project and how you solved it.
+| Challenges | Work Around |
+|------------------|------------------|
+| I was not familiar about how to run docker as a non-root user | I researched it through youtube tutorials, then once I understood why is it important and how to do it, I implemented it into my code. |
+| Confused on how to build a CI pipeline from scratch | Again, through youtube tutorials I learned that writing a ci pipeline just follows a set of steps, often called jobs, that it runs per check. With this and a syntax guide, I was able to create a ci.yml from scratch. |
 
