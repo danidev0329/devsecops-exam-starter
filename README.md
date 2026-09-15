@@ -64,7 +64,7 @@ The Dockerfile uses `node:20-alpine` instead of `node:latest` for a few reasons:
 The `Dockerfile` uses a two-stage build to keep the final image as small and secure as possible:
 
 1. **Build stage (`FROM node:20-alpine AS build`)** — copies only `package*.json`, installs production dependencies with `npm ci --omit=dev`, and nothing more. This stage contains npm (and its transitive dependencies), but is discarded after the build.
-2. **Production stage** — starts from a fresh `node:20-alpine` image. It removes the bundled npm (`/usr/local/bin/npm`, `/usr/local/bin/npx`, and `/usr/local/lib/node_modules/npm`), then copies only the installed `node_modules` and application source from the build stage. Finally, it runs as the unprivileged `node` user (`USER node`).
+2. **Production stage** — starts from a fresh `node:20-alpine` image. It removes the bundled npm, then copies only the installed `node_modules` and application source from the build stage. Finally, it runs as the unprivileged `node` user (`USER node`).
 
 This means the runtime image has no package manager, no source-manifest copies, and no root privileges — shrinking the image and eliminating tooling-only dependencies (such as the `tar` library bundled with npm) from the runtime attack surface.
 
